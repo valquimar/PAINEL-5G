@@ -1,46 +1,28 @@
 #!/bin/bash
-# Painel 5G - Script de Instalação
+# Script de instalação do Painel 5G
 
-# Verificações iniciais
-if [ "$EUID" -ne 0 ]; then
-  echo "Por favor, execute como root"
-  exit
-fi
+# Atualizar pacotes
+apt update && apt upgrade -y
 
-echo "Atualizando pacotes..."
-apt update -y && apt upgrade -y
+# Instalar Apache, PHP e MySQL
+apt install apache2 php php-mysql mysql-server unzip git curl -y
 
-echo "Instalando Apache, MySQL, PHP..."
-apt install apache2 mysql-server php php-mysql unzip curl git -y
-
-echo "Configurando firewall..."
-ufw allow 'Apache Full'
-
-echo "Baixando arquivos do Painel 5G..."
-mkdir -p /var/www/painel5g
-cd /var/www/painel5g
-
-# Simulando conteúdo do painel
-echo "<?php phpinfo(); ?>" > index.php
-
-# Permissões
-chown -R www-data:www-data /var/www/painel5g
-chmod -R 755 /var/www/painel5g
-
-echo "Configurando Apache..."
-cat <<EOF > /etc/apache2/sites-available/painel5g.conf
-<VirtualHost *:80>
-    DocumentRoot /var/www/painel5g
-    <Directory /var/www/painel5g>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+# Configurar banco de dados
+mysql -u root <<EOF
+CREATE DATABASE painel5g CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'painel5guser'@'localhost' IDENTIFIED BY 'senhaSeguraAqui';
+GRANT ALL PRIVILEGES ON painel5g.* TO 'painel5guser'@'localhost';
+FLUSH PRIVILEGES;
 EOF
 
-a2ensite painel5g.conf
-a2dissite 000-default.conf
-systemctl reload apache2
+# Copiar arquivos do painel
+mkdir -p /var/www/html/painel5g
+cp -r painel5g-main/* /var/www/html/painel5g/
 
-echo "Instalação concluída! Acesse pelo IP do seu servidor."
+# Importar banco de dados
+mysql -u root painel5g < /var/www/html/painel5g/painel5g.sql
+
+# Reiniciar serviços
+systemctl restart apache2
+
+echo "Instalação concluída! Acesse http://IP_DO_SERVIDOR/painel5g"

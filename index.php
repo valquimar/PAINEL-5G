@@ -1,0 +1,1 @@
+<?php echo 'Painel 5G funcionando!'; ?>

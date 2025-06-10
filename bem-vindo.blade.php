@@ -1,1 +1,0 @@
-<html><body>Bem-vindo ao SkyPanel</body></html>

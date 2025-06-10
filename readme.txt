@@ -1,1 +1,0 @@
-Painel 5G - Estrutura inicial simulada para instalação automática.

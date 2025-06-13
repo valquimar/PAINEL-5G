@@ -9,17 +9,17 @@ apt update -y && apt upgrade -y
 # Instala pacotes necessários
 apt install apache2 php php-mysql mysql-server unzip curl git -y
 
-# Configura MySQL (senha padrão: skypanel)
-MYSQL_ROOT_PASSWORD="skypanel"
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_ROOT_PASSWORD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD"
+# Configurar MySQL (senha padrão: paineldoceu)
+MYSQL_ROOT_PASSWORD="paineldoceu"
+echo "mysql-server mysql-server/root_password password $MYSQL_ROOT_PASSWORD" | debconf-set-selections
+echo "mysql-server mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD" | debconf-set-selections
 
-# Clona os arquivos do SkyPanel (backend e frontend)
+# Clona os arquivos do SkyPanel
 mkdir -p /var/www/html/skypanel
 cd /var/www/html/skypanel
 git clone https://github.com/valquimar/PAINEL-5G.git .
 
-# Dá permissão aos arquivos
+# Dá permissões aos arquivos
 chown -R www-data:www-data /var/www/html/skypanel
 chmod -R 755 /var/www/html/skypanel
 
@@ -36,6 +36,6 @@ IP=$(curl -s ipv4.icanhazip.com)
 echo ""
 echo "✅ SkyPanel instalado com sucesso!"
 echo "🌐 Acesse: http://$IP/skypanel"
-echo "📂 Diretório: /var/www/html/skypanel"
+echo "📁 Diretório: /var/www/html/skypanel"
 echo "🗄️ Banco de dados: skypanel"
 echo "🔐 Usuário MySQL root, senha: $MYSQL_ROOT_PASSWORD"
